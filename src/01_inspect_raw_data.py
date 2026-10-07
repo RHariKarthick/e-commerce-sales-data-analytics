@@ -24,6 +24,7 @@ def main() -> int:
             continue
 
         df = pd.read_csv(path, dtype={c: "string" for c in STRING_COLUMNS.get(filename, [])})
+        numeric_columns = df.select_dtypes(include=["number"])
         missing = df.isna().sum()
         summary = {
             "file": filename,
@@ -40,7 +41,7 @@ def main() -> int:
             "column_names": list(df.columns),
             "dtypes": {str(k): str(v) for k, v in df.dtypes.items()},
             "missing_by_column": {str(k): int(v) for k, v in missing.items() if v},
-            "numeric_describe": df.describe(include=["number"]).to_dict(),
+            "numeric_describe": numeric_columns.describe().to_dict() if not numeric_columns.empty else {},
             "sample_unique_values": {
                 str(column): [None if pd.isna(x) else str(x) for x in df[column].dropna().unique()[:10]]
                 for column in df.select_dtypes(include=["object", "string"]).columns
