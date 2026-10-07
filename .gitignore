@@ -1,0 +1,24 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Secrets and local configuration
+.env
+*.pem
+
+# Source data is governed by its original publisher's terms; do not commit it.
+data/raw/*.csv
+data/cleaned/*.csv
+
+# Generated reports and local exports
+reports/generated/
+*.log
+*.xlsx
+*.pbix
+*.pbit
+*.bak
+Thumbs.db
+.DS_Store

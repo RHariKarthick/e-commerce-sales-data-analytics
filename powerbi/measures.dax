@@ -1,0 +1,69 @@
+-- Create these measures in Power BI after importing the MySQL tables.
+Total Item Revenue =
+SUMX ( order_items, order_items[price] + order_items[freight_value] )
+
+Total Orders =
+DISTINCTCOUNT ( orders[order_id] )
+
+Delivered Orders =
+CALCULATE ( [Total Orders], orders[order_status] = "delivered" )
+
+Unique Customers =
+DISTINCTCOUNT ( customers[customer_unique_id] )
+
+Customers with Delivered Orders =
+CALCULATE (
+    DISTINCTCOUNT ( customers[customer_unique_id] ),
+    orders[order_status] = "delivered"
+)
+
+Average Order Value =
+DIVIDE ( [Total Item Revenue], DISTINCTCOUNT ( order_items[order_id] ) )
+
+Total Units Sold =
+COUNTROWS ( order_items )
+
+Average Review Score =
+AVERAGE ( order_reviews[review_score] )
+
+On Time Orders =
+CALCULATE (
+    [Total Orders],
+    FILTER (
+        orders,
+        NOT ISBLANK ( orders[order_delivered_customer_date] )
+            && orders[order_delivered_customer_date] <= orders[order_estimated_delivery_date]
+    )
+)
+
+Late Orders =
+CALCULATE (
+    [Total Orders],
+    FILTER (
+        orders,
+        NOT ISBLANK ( orders[order_delivered_customer_date] )
+            && orders[order_delivered_customer_date] > orders[order_estimated_delivery_date]
+    )
+)
+
+On Time Delivery Rate =
+DIVIDE ( [On Time Orders], [On Time Orders] + [Late Orders] )
+
+Late Delivery Rate =
+DIVIDE ( [Late Orders], [On Time Orders] + [Late Orders] )
+
+Repeat Customers =
+VAR CustomerOrderCounts =
+    ADDCOLUMNS (
+        VALUES ( customers[customer_unique_id] ),
+        "OrderCount",
+            CALCULATE (
+                DISTINCTCOUNT ( orders[order_id] ),
+                orders[order_status] = "delivered"
+            )
+    )
+RETURN
+    COUNTROWS ( FILTER ( CustomerOrderCounts, [OrderCount] > 1 ) )
+
+Repeat Customer Rate =
+DIVIDE ( [Repeat Customers], [Customers with Delivered Orders] )
