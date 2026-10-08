@@ -23,7 +23,8 @@ ECommerce-Sales-Analytics/
 │   └── measures.dax
 ├── reports/
 │   ├── README.md
-│   └── insights_template.md
+│   ├── insights_template.md
+│   └── business_insights.md  # Findings from the completed SQL analysis
 ├── requirements.txt
 └── .gitignore
 ```
@@ -126,7 +127,7 @@ Run `sql/validation.sql` in Workbench first. Compare table counts with the Pytho
 
 Follow [`powerbi/README.md`](powerbi/README.md) to connect Power BI Desktop to the MySQL tables, create the star-like relationships, add the DAX measures in [`powerbi/measures.dax`](powerbi/measures.dax), and build the three report pages: Executive Overview, Product & Sales, and Customer & Operations. Validate dashboard totals against SQL before using them in a portfolio or resume.
 
-The `.pbix` is not supplied because it must be created and checked in Power BI Desktop after the MySQL database is populated. Likewise, no business insight or numeric result is claimed until it has been calculated from the downloaded data; record verified findings in `reports/insights_template.md`.
+The `.pbix` is not supplied because it must be created and checked in Power BI Desktop after the MySQL database is populated. Verified findings from the completed SQL analysis are recorded in [`reports/business_insights.md`](reports/business_insights.md). Use [`reports/insights_template.md`](reports/insights_template.md) to document additional findings.
 
 ## Reproducible run order
 
