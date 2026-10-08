@@ -5,7 +5,7 @@ These findings summarize the MySQL validation and analysis results supplied for 
 ## Sales and products
 
 - Across order items, item price plus freight totaled **R$15,843,553.24** across **112,650 units** and **98,666 orders with items**. The resulting average item revenue per order with items was **R$160.58**. This is item revenue, not the separately recorded payment total.
-- **Health and beauty** led category revenue at **R$1,441,248.07 (9.10%)**, followed by **watches and gifts** at R$1,305,541.61 (8.24%), **bed, bath and table** at R$1,241,681.72 (7.84%), **sports and leisure** at R$1,156,656.48 (7.30%), and **computers and accessories** at R$1,059,272.40 (6.69%). Together the top five contributed **39.17%** of item revenue.
+- **Health and beauty** led category revenue at **R$1,441,248.07 (9.10%)**, followed by **watches and gifts** at R$1,305,541.61 (8.24%), **bed, bath and table** at R$1,241,681.72 (7.84%), **sports and leisure** at R$1,156,656.48 (7.30%), and **computers and accessories** at R$1,059,272.40 (6.69%). Together the top five contributed **39.16%** of item revenue (calculated from unrounded totals; displayed category shares are rounded).
 - The category query includes all order statuses. The state, monthly, and delivery comparisons below use delivered orders as specified by their SQL sections; treat these populations separately.
 
 ## Customers and geography
