@@ -5,8 +5,13 @@ These findings summarize the MySQL validation and analysis results supplied for 
 ## Sales and products
 
 - Across order items, item price plus freight totaled **R$15,843,553.24** across **112,650 units** and **98,666 orders with items**. The resulting average item revenue per order with items was **R$160.58**. This is item revenue, not the separately recorded payment total.
-- **Health and beauty** led category revenue at **R$1,441,248.07 (9.10%)**, followed by **watches and gifts** at R$1,305,541.61 (8.24%), **bed, bath and table** at R$1,241,681.72 (7.84%), **sports and leisure** at R$1,156,656.48 (7.30%), and **computers and accessories** at R$1,059,272.40 (6.69%). Together the top five contributed **39.16%** of item revenue (calculated from unrounded totals; displayed category shares are rounded).
+- **Health and beauty** led category revenue at **R$1,441,248.07 (9.10%)**, followed by **watches and gifts** at R$1,305,541.61 (8.24%), **bed, bath and table** at R$1,241,681.72 (7.84%), **sports and leisure** at R$1,156,656.48 (7.30%), and **computers and accessories** at R$1,059,272.40 (6.69%). Together the top five contributed **39.16%** of item revenue, calculated from unrounded totals.
 - The category query includes all order statuses. The state, monthly, and delivery comparisons below use delivered orders as specified by their SQL sections; treat these populations separately.
+
+## Monthly sales and review scores
+
+- Monthly delivered item revenue peaked at **R$1,153,364.20 in November 2017** in the period shown. The complete calendar query also shows zero delivered item revenue for November 2016, September 2018, and October 2018. Percentage changes after a zero-revenue month are undefined, so SQL returns `NULL` for that comparison. Very large percentage changes from the early low-revenue months should be read alongside the underlying amounts.
+- The 99,224 review records were distributed as follows: **1 star: 11,424; 2 stars: 3,151; 3 stars: 8,179; 4 stars: 19,142; 5 stars: 57,328**. Five-star reviews were **57.78%** of records; four- and five-star reviews together were **77.07%**. The average score across review records was **4.09**.
 
 ## Customers and geography
 
@@ -21,8 +26,7 @@ These findings summarize the MySQL validation and analysis results supplied for 
 
 ## Interpretation and reporting notes
 
-- The monthly result screenshot omitted months without delivered revenue. Its displayed month-over-month percentages therefore compared adjacent returned rows rather than necessarily adjacent calendar months. `sql/analysis.sql` now creates a complete month calendar, fills absent months with zero, and calculates month-over-month change across calendar months. Rerun section 2 before publishing monthly growth figures; this report does not repeat the earlier percentages.
-- The earlier review-score distribution used distinct orders per score, which can count one order in more than one score group when multiple reviews exist. Section 10 now reports review-record counts and excludes null scores. Rerun it before quoting a score distribution.
+- `sql/analysis.sql` now creates a complete month calendar, fills absent months with zero, and calculates month-over-month change across calendar months. Section 10 reports review-record counts and excludes null scores. The findings above use the updated query outputs supplied after those corrections.
 - Item revenue is calculated as item price plus freight at order-item grain. Payment value comes from the payment table and is analyzed separately. Do not add them together or join both raw grains before aggregation.
 - Results are based on the loaded/cleaned Olist data and SQL outputs shared for the project. Validate refreshed results against the database before using them in a presentation or portfolio.
 
