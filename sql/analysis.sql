@@ -11,14 +11,27 @@ SELECT ROUND(SUM(price + freight_value), 2) AS total_item_revenue,
 FROM order_items;
 
 -- 2. Monthly revenue and month-over-month change (MySQL 8+)
-WITH monthly AS (
-  SELECT DATE_FORMAT(o.order_purchase_timestamp, '%Y-%m-01') AS month_start,
+WITH RECURSIVE months AS (
+  SELECT CAST(DATE_FORMAT(MIN(order_purchase_timestamp), '%Y-%m-01') AS DATE) AS month_start
+  FROM orders
+  UNION ALL
+  SELECT DATE_ADD(month_start, INTERVAL 1 MONTH)
+  FROM months
+  WHERE month_start < (
+    SELECT CAST(DATE_FORMAT(MAX(order_purchase_timestamp), '%Y-%m-01') AS DATE)
+    FROM orders
+  )
+), monthly_sales AS (
+  SELECT CAST(DATE_FORMAT(o.order_purchase_timestamp, '%Y-%m-01') AS DATE) AS month_start,
          SUM(oi.price + oi.freight_value) AS revenue
   FROM orders o JOIN order_items oi USING (order_id)
   WHERE o.order_status = 'delivered'
-  GROUP BY DATE_FORMAT(o.order_purchase_timestamp, '%Y-%m-01')
+  GROUP BY CAST(DATE_FORMAT(o.order_purchase_timestamp, '%Y-%m-01') AS DATE)
+), monthly AS (
+  SELECT m.month_start, COALESCE(s.revenue, 0) AS revenue
+  FROM months m LEFT JOIN monthly_sales s USING (month_start)
 )
-SELECT month_start, ROUND(revenue, 2) AS revenue,
+SELECT DATE_FORMAT(month_start, '%Y-%m-01') AS month_start, ROUND(revenue, 2) AS revenue,
        ROUND(100 * (revenue - LAG(revenue) OVER (ORDER BY month_start)) /
          NULLIF(LAG(revenue) OVER (ORDER BY month_start), 0), 2) AS mom_change_pct
 FROM monthly ORDER BY month_start;
@@ -105,9 +118,11 @@ SELECT d.delivery_bucket, COUNT(*) AS reviewed_orders,
 FROM delivery d JOIN review_by_order r USING (order_id)
 GROUP BY d.delivery_bucket ORDER BY reviewed_orders DESC;
 
--- 10. Review score distribution
-SELECT review_score, COUNT(DISTINCT order_id) AS reviewed_orders
-FROM order_reviews GROUP BY review_score ORDER BY review_score;
+-- 10. Review score distribution at review-record grain. An order can have multiple reviews.
+SELECT review_score, COUNT(*) AS review_records
+FROM order_reviews
+WHERE review_score IS NOT NULL
+GROUP BY review_score ORDER BY review_score;
 
 -- 11. Ranking states by revenue (window function)
 WITH state_sales AS (
@@ -118,3 +133,4 @@ WITH state_sales AS (
 SELECT customer_state, ROUND(revenue, 2) AS revenue,
        RANK() OVER (ORDER BY revenue DESC) AS state_rank
 FROM state_sales ORDER BY state_rank;
+
